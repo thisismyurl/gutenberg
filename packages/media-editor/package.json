@@ -44,6 +44,7 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
@@ -63,6 +64,9 @@
 		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1",
 		"gl-matrix": "^3.4.3"
+	},
+	"devDependencies": {
+		"@storybook/react-vite": "^10.2.8"
 	},
 	"peerDependencies": {
 		"react": "^19.2.4"

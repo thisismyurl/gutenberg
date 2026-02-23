@@ -1,4 +1,12 @@
-import { type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
+
+export interface ThemeProviderStyles {
+	resolvedSettings: {
+		color: { primary: string; bg: string };
+		cursor: { control: 'default' | 'pointer' } | undefined;
+	};
+	themeProviderStyles: CSSProperties;
+}
 
 export interface ThemeProviderSettings {
 	/**

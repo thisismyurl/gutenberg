@@ -63,7 +63,10 @@ function makeListener( { allowedImports, context } ) {
 				return;
 			}
 
-			const importedName = specifierNode.imported.name;
+			const importedName =
+				specifierNode.imported.type === 'Identifier'
+					? specifierNode.imported.name
+					: String( specifierNode.imported.value );
 
 			if (
 				! importedName.startsWith( '__unstable' ) &&
