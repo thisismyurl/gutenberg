@@ -8,7 +8,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useMediaEditor } from '../../state';
+import { resolveAspectRatio, useMediaEditor } from '../../state';
 import {
 	useCropGestureHandlers,
 	CROP_CONTROL_ATTR,
@@ -16,6 +16,7 @@ import {
 import { MAX_ZOOM } from '../../image-editor/core/constants';
 import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import CropAdvancedPanel from './crop-advanced-panel';
 
 const ZOOM_PERCENTAGE_SCALE = 100;
 const MAX_ZOOM_PERCENTAGE = MAX_ZOOM * ZOOM_PERCENTAGE_SCALE;
@@ -63,6 +64,10 @@ export default function MediaEditorCropPanel( {
 	const minZoom = getMinZoom( state );
 	const zoomPercentage = getZoomPercentageForDisplay( state.zoom );
 	const minZoomPercentage = getMinZoomPercentageForDisplay( minZoom );
+	const resolvedAspectRatio = resolveAspectRatio(
+		aspectRatioValue,
+		state.image
+	);
 
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
@@ -116,6 +121,11 @@ export default function MediaEditorCropPanel( {
 					} }
 				/>
 			</div>
+			<CropAdvancedPanel
+				aspectRatio={ resolvedAspectRatio }
+				freeformCrop
+				onPlacementControlInteraction={ onPlacementControlInteraction }
+			/>
 		</Stack>
 	);
 }
