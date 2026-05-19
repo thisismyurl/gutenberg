@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -59,9 +59,11 @@ const PlaylistEdit = ( {
 		currentTrack,
 	} = attributes;
 
-	// Extract the waveform style from the block style variation class.
-	const waveformStyle =
-		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
+	const [ isShuffled, setIsShuffled ] = useState( false );
+
+	// Extract the visualization style from the block style variation class.
+	const visualizationStyle =
+		attributes.className?.match( /is-style-(\w+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -174,8 +176,30 @@ const PlaylistEdit = ( {
 		( track ) => track.uniqueId === currentTrack
 	);
 
-	// Handle track end - advance to next track or loop to first.
+	// Use a ref for shuffle state so callbacks always see the latest value.
+	const isShuffledRef = useRef( isShuffled );
+	isShuffledRef.current = isShuffled;
+
+	// Pick a random track that isn't the current one.
+	const getRandomTrack = useCallback( () => {
+		const otherTracks = tracks.filter(
+			( track ) => track.uniqueId !== currentTrack
+		);
+		if ( otherTracks.length === 0 ) {
+			return tracks[ 0 ];
+		}
+		return otherTracks[ Math.floor( Math.random() * otherTracks.length ) ];
+	}, [ tracks, currentTrack ] );
+
+	// Handle track end - advance to next track, respecting shuffle.
 	const onTrackEnded = useCallback( () => {
+		if ( isShuffledRef.current ) {
+			const randomTrack = getRandomTrack();
+			if ( randomTrack?.uniqueId ) {
+				setAttributes( { currentTrack: randomTrack.uniqueId } );
+			}
+			return;
+		}
 		const currentIndex = tracks.findIndex(
 			( track ) => track.uniqueId === currentTrack
 		);
@@ -183,7 +207,40 @@ const PlaylistEdit = ( {
 		if ( nextTrack?.uniqueId ) {
 			setAttributes( { currentTrack: nextTrack.uniqueId } );
 		}
+	}, [ currentTrack, tracks, setAttributes, getRandomTrack ] );
+
+	const onPrev = useCallback( () => {
+		const currentIndex = tracks.findIndex(
+			( track ) => track.uniqueId === currentTrack
+		);
+		const prevTrack =
+			tracks[ currentIndex - 1 ] || tracks[ tracks.length - 1 ];
+		if ( prevTrack?.uniqueId ) {
+			setAttributes( { currentTrack: prevTrack.uniqueId } );
+		}
 	}, [ currentTrack, tracks, setAttributes ] );
+
+	const onNext = useCallback( () => {
+		if ( isShuffledRef.current ) {
+			const randomTrack = getRandomTrack();
+			if ( randomTrack?.uniqueId ) {
+				setAttributes( { currentTrack: randomTrack.uniqueId } );
+			}
+			return;
+		}
+		const currentIndex = tracks.findIndex(
+			( track ) => track.uniqueId === currentTrack
+		);
+		const nextTrack =
+			tracks[ currentIndex + 1 ] || tracks[ 0 ];
+		if ( nextTrack?.uniqueId ) {
+			setAttributes( { currentTrack: nextTrack.uniqueId } );
+		}
+	}, [ currentTrack, tracks, setAttributes, getRandomTrack ] );
+
+	const onShuffleToggle = useCallback( () => {
+		setIsShuffled( ( prev ) => ! prev );
+	}, [] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -398,8 +455,12 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
-						waveformStyle={ waveformStyle }
+						visualizationStyle={ visualizationStyle }
 						onEnded={ onTrackEnded }
+						onPrev={ onPrev }
+						onNext={ onNext }
+						onShuffleToggle={ onShuffleToggle }
+						isShuffled={ isShuffled }
 					/>
 				</Disabled>
 				{ showTracklist && (

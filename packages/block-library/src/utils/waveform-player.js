@@ -30,6 +30,10 @@ import {
  * @param {boolean}  props.showProgressBackground - Whether to show progress background.
  * @param {string}   props.progressColor          - Custom progress background color.
  * @param {Function} props.onEnded                - Callback when the track finishes playing.
+ * @param {Function} props.onPrev                 - Callback for previous track.
+ * @param {Function} props.onNext                 - Callback for next track.
+ * @param {Function} props.onShuffleToggle        - Callback for shuffle toggle.
+ * @param {boolean}  props.isShuffled             - Whether shuffle is active.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -42,14 +46,25 @@ export function WaveformPlayer( {
 	showProgressBackground,
 	progressColor,
 	onEnded,
+	onPrev,
+	onNext,
+	onShuffleToggle,
+	isShuffled,
 } ) {
-	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
-	// The callback changes reference on every render (its dependency chain
-	// includes an unstable array), which would cause useRefEffect to destroy
-	// and recreate the entire player on every re-render, making it disappear
-	// during editor resizes.
+	// Store callbacks in refs so they don't need to be useRefEffect dependencies.
+	// These callbacks change reference on every render (their dependency chains
+	// include unstable arrays), which would cause useRefEffect to destroy
+	// and recreate the entire player on every re-render.
 	const onEndedRef = useRef( onEnded );
 	onEndedRef.current = onEnded;
+	const onPrevRef = useRef( onPrev );
+	onPrevRef.current = onPrev;
+	const onNextRef = useRef( onNext );
+	onNextRef.current = onNext;
+	const onShuffleToggleRef = useRef( onShuffleToggle );
+	onShuffleToggleRef.current = onShuffleToggle;
+	const isShuffledRef = useRef( isShuffled );
+	isShuffledRef.current = isShuffled;
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -81,6 +96,11 @@ export function WaveformPlayer( {
 					progressBackgroundColor: progressBgColor,
 					bgColor,
 					onEnded: () => onEndedRef.current?.(),
+					onPrev: () => onPrevRef.current?.(),
+					onNext: () => onNextRef.current?.(),
+					onShuffleToggle: () =>
+						onShuffleToggleRef.current?.(),
+					isShuffled: isShuffledRef.current,
 				} );
 				playerDestroy = player.destroy;
 			}
