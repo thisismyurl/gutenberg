@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `sm`, `md`, `lg`) via prebuilt design token modes.
+-   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `sm`, `md`, `lg`, `xl`, `2xl`) via prebuilt design token modes.
 
 ### Breaking Changes
 
