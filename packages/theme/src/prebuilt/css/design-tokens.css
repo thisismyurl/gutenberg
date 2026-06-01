@@ -357,7 +357,7 @@
 	/* Extra small radius */
 	--wpds-border-radius-xs: 3px;
 	/* Small radius */
-	--wpds-border-radius-sm: 6px;
+	--wpds-border-radius-sm: 5px;
 	/* Medium radius */
 	--wpds-border-radius-md: 8px;
 	/* Large radius */
@@ -369,7 +369,7 @@
 	/* Extra small radius */
 	--wpds-border-radius-xs: 5px;
 	/* Small radius */
-	--wpds-border-radius-sm: 10px;
+	--wpds-border-radius-sm: 8px;
 	/* Medium radius */
 	--wpds-border-radius-md: 12px;
 	/* Large radius */
@@ -381,7 +381,7 @@
 	/* Extra small radius */
 	--wpds-border-radius-xs: 7px;
 	/* Small radius */
-	--wpds-border-radius-sm: 14px;
+	--wpds-border-radius-sm: 12px;
 	/* Medium radius */
 	--wpds-border-radius-md: 16px;
 	/* Large radius */
