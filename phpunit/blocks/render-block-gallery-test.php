@@ -84,6 +84,32 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_dynamic_attached_to_post_honours_order() {
+		$asc = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicSource":{"type":"attachedToPost","orderby":"date","order":"asc"}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+		);
+		$desc = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicSource":{"type":"attachedToPost","orderby":"date","order":"desc"}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure><!-- /wp:gallery -->'
+		);
+
+		$first  = self::$attachment_ids[0];
+		$second = self::$attachment_ids[1];
+
+		// Oldest to newest: the first-created attachment renders before the second.
+		$this->assertLessThan(
+			strpos( $asc, 'wp-image-' . $second ),
+			strpos( $asc, 'wp-image-' . $first ),
+			'With order=asc the earlier attachment should render first.'
+		);
+
+		// Newest to oldest reverses that order.
+		$this->assertLessThan(
+			strpos( $desc, 'wp-image-' . $first ),
+			strpos( $desc, 'wp-image-' . $second ),
+			'With order=desc the later attachment should render first.'
+		);
+	}
+
 	public function test_dynamic_unknown_source_type_renders_no_images() {
 		$output = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicSource":{"type":"notARealSource"}} --><figure class="wp-block-gallery has-nested-images columns-default"></figure><!-- /wp:gallery -->'

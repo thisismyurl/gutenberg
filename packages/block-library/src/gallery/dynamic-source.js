@@ -4,6 +4,16 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Default ordering for a dynamic source. `menu_order` (the manual media-library
+ * order) is intentionally not used: it isn't a valid `orderby` value on the
+ * media REST endpoint, so the editor preview couldn't reproduce it. Both the
+ * editor query and the server resolver default to the same REST-supported order
+ * so the preview matches the frontend.
+ */
+export const DEFAULT_ORDERBY = 'date';
+export const DEFAULT_ORDER = 'desc';
+
+/**
  * Maps a gallery's `dynamicSource` attribute to a query for the `attachment`
  * entity (i.e. `/wp/v2/media` collection params), used to resolve the source to
  * a list of media in the editor.
@@ -31,6 +41,9 @@ export function getSourceQuery( dynamicSource, { postId } ) {
 			return {
 				parent: postId,
 				per_page: -1,
+				orderby: DEFAULT_ORDERBY,
+				order: DEFAULT_ORDER,
+				// Any `orderby`/`order` set on the source overrides the defaults.
 				...rest,
 			};
 	}
@@ -53,4 +66,21 @@ export function getSourceLabel( dynamicSource ) {
 	}
 
 	return __( 'Dynamic images' );
+}
+
+/**
+ * Returns a sentence describing a `dynamicSource`, for use as help text beneath
+ * the Source controls. Unlike `getSourceLabel` (a short label for menus/options)
+ * this reads as a complete sentence, ending with a period.
+ *
+ * @param {Object} dynamicSource The gallery's `dynamicSource` attribute.
+ * @return {string} A translated description.
+ */
+export function getSourceDescription( dynamicSource ) {
+	switch ( dynamicSource?.type ) {
+		case 'attachedToPost':
+			return __( 'Images attached to this post.' );
+	}
+
+	return __( 'Dynamic images.' );
 }

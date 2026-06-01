@@ -76,9 +76,32 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 			if ( ! $post_id ) {
 				return array();
 			}
-			// `get_attached_media()` preserves menu order, then date.
-			$attachments = get_attached_media( 'image', $post_id );
-			return array_map( 'intval', array_keys( $attachments ) );
+
+			// Honour the source's `orderby`/`order` (REST-named), defaulting to
+			// the same order as the editor preview (see `dynamic-source.js`).
+			// Only REST-supported orderby values are allowed; `menu_order` is
+			// intentionally unsupported (it isn't a valid media REST `orderby`).
+			$orderby = $source['orderby'] ?? 'date';
+			if ( ! in_array( $orderby, array( 'date', 'title' ), true ) ) {
+				$orderby = 'date';
+			}
+			$order = strtoupper( $source['order'] ?? 'desc' ) === 'ASC' ? 'ASC' : 'DESC';
+
+			$query = new WP_Query(
+				array(
+					'post_parent'    => $post_id,
+					'post_type'      => 'attachment',
+					'post_status'    => 'inherit',
+					'post_mime_type' => 'image',
+					'orderby'        => $orderby,
+					'order'          => $order,
+					'posts_per_page' => -1,
+					'fields'         => 'ids',
+					'no_found_rows'  => true,
+				)
+			);
+
+			return array_map( 'intval', $query->posts );
 	}
 
 	// Unknown or not-yet-implemented source type.

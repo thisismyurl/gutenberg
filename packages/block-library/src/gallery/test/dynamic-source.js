@@ -4,26 +4,43 @@
 import { getSourceQuery, getSourceLabel } from '../dynamic-source';
 
 describe( 'getSourceQuery', () => {
-	it( 'resolves the attachedToPost anchor to the REST `parent` param', () => {
+	it( 'resolves the attachedToPost anchor to the REST `parent` param with default ordering', () => {
 		expect(
 			getSourceQuery( { type: 'attachedToPost' }, { postId: 42 } )
 		).toEqual( {
 			parent: 42,
 			per_page: -1,
+			orderby: 'date',
+			order: 'desc',
+		} );
+	} );
+
+	it( 'lets the source override the default ordering', () => {
+		expect(
+			getSourceQuery(
+				{ type: 'attachedToPost', orderby: 'title', order: 'asc' },
+				{ postId: 7 }
+			)
+		).toEqual( {
+			parent: 7,
+			per_page: -1,
+			orderby: 'title',
+			order: 'asc',
 		} );
 	} );
 
 	it( 'passes through additional REST-named fields verbatim', () => {
 		expect(
 			getSourceQuery(
-				{ type: 'attachedToPost', orderby: 'menu_order', order: 'asc' },
+				{ type: 'attachedToPost', author: 5 },
 				{ postId: 7 }
 			)
 		).toEqual( {
 			parent: 7,
 			per_page: -1,
-			orderby: 'menu_order',
-			order: 'asc',
+			orderby: 'date',
+			order: 'desc',
+			author: 5,
 		} );
 	} );
 

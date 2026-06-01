@@ -72,7 +72,12 @@ import GapStyles from './gap-styles';
 import useDynamicImages from './use-dynamic-images';
 import DynamicGalleryPreview from './dynamic-gallery-preview';
 import buildImageBlockAttributes from './build-image-block-attributes';
-import { getSourceLabel } from './dynamic-source';
+import {
+	getSourceDescription,
+	DEFAULT_ORDERBY,
+	DEFAULT_ORDER,
+} from './dynamic-source';
+import OrderControl from './order-control';
 
 const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
@@ -145,6 +150,10 @@ export default function GalleryEdit( props ) {
 
 	const isDynamic = !! attributes.dynamicSource;
 	const postId = context?.postId;
+
+	// Current source ordering, falling back to the shared defaults when unset.
+	const sourceOrderby = attributes.dynamicSource?.orderby ?? DEFAULT_ORDERBY;
+	const sourceOrder = attributes.dynamicSource?.order ?? DEFAULT_ORDER;
 
 	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
 		useSettings(
@@ -504,6 +513,23 @@ export default function GalleryEdit( props ) {
 		setAttributes( { dynamicSource: undefined } );
 	}
 
+	// Updates the source ordering. Passing `undefined` (or the default order)
+	// strips the keys so they aren't persisted redundantly and the ToolsPanel
+	// item reads as unset.
+	function setSourceOrder( nextOrderby, nextOrder ) {
+		const nextSource = { ...attributes.dynamicSource };
+		delete nextSource.orderby;
+		delete nextSource.order;
+		if (
+			nextOrderby !== undefined &&
+			( nextOrderby !== DEFAULT_ORDERBY || nextOrder !== DEFAULT_ORDER )
+		) {
+			nextSource.orderby = nextOrderby;
+			nextSource.order = nextOrder;
+		}
+		setAttributes( { dynamicSource: nextSource } );
+	}
+
 	function setLinkTo( value ) {
 		setAttributes( { linkTo: value } );
 		const changedAttributes = {};
@@ -788,34 +814,64 @@ export default function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
-				{ Platform.isWeb && (
-					<PanelBody title={ __( 'Source' ) }>
-						{ isDynamic ? (
-							<>
-								<p>
-									{ getSourceLabel(
-										attributes.dynamicSource
-									) }
-								</p>
-								<Button
-									__next40pxDefaultSize
-									variant="secondary"
-									onClick={ convertToStatic }
-									disabled={ ! dynamicMedia.length }
-									accessibleWhenDisabled
-								>
-									{ __( 'Convert to individual images' ) }
-								</Button>
-							</>
-						) : (
+				{ Platform.isWeb && isDynamic && (
+					<ToolsPanel
+						label={ __( 'Source' ) }
+						resetAll={ () =>
+							setAttributes( {
+								dynamicSource: {
+									type: attributes.dynamicSource.type,
+								},
+							} )
+						}
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<div className="wp-block-gallery__source-settings">
+							<p className="wp-block-gallery__source-description">
+								{ getSourceDescription(
+									attributes.dynamicSource
+								) }
+							</p>
 							<Button
 								__next40pxDefaultSize
 								variant="secondary"
-								onClick={ requestEnableDynamicMode }
+								onClick={ convertToStatic }
+								disabled={ ! dynamicMedia.length }
+								accessibleWhenDisabled
 							>
-								{ __( 'Display images attached to this post' ) }
+								{ __( 'Convert to individual images' ) }
 							</Button>
-						) }
+						</div>
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Order by' ) }
+							hasValue={ () =>
+								sourceOrderby !== DEFAULT_ORDERBY ||
+								sourceOrder !== DEFAULT_ORDER
+							}
+							onDeselect={ () =>
+								setSourceOrder( undefined, undefined )
+							}
+						>
+							<OrderControl
+								orderby={ sourceOrderby }
+								order={ sourceOrder }
+								onChange={ ( { orderby, order } ) =>
+									setSourceOrder( orderby, order )
+								}
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				) }
+				{ Platform.isWeb && ! isDynamic && (
+					<PanelBody title={ __( 'Source' ) }>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ requestEnableDynamicMode }
+						>
+							{ __( 'Display images attached to this post' ) }
+						</Button>
 					</PanelBody>
 				) }
 				{ Platform.isWeb && (
