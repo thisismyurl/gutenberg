@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-dimension-size-*` design tokens for element sizing ([#76545](https://github.com/WordPress/gutenberg/pull/76545)).
+
 ### Breaking Changes
 
 -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
