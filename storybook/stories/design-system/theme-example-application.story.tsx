@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import type { CornerRadiusPreset } from '@wordpress/theme';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import {
@@ -43,15 +42,14 @@ export default meta;
 /**
  * A mock application page demonstrating how `ThemeProvider` affects multiple
  * `@wordpress/ui` components in concert. Use the inline controls to adjust
- * the `primary` and `bg` seed colors, the corner radius preset, and observe
- * how every surface, text element, and interactive control adapts accordingly.
+ * the `primary` and `bg` seed colors, and observe how every surface, text
+ * element, and interactive control adapts accordingly. Use the Theme toolbar
+ * tool to adjust corner radius and other theme aspects.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		const [ primary, setPrimary ] = useState< string | undefined >();
 		const [ bg, setBg ] = useState< string | undefined >();
-		const [ cornerRadiusPreset, setCornerRadiusPreset ] =
-			useState< CornerRadiusPreset >( 'sm' );
 
 		return (
 			<div>
@@ -97,35 +95,9 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							onChange={ ( e ) => setBg( e.target.value ) }
 						/>
 					</label>
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Corner radius
-						<select
-							value={ cornerRadiusPreset }
-							onChange={ ( e ) =>
-								setCornerRadiusPreset(
-									e.target.value as typeof cornerRadiusPreset
-								)
-							}
-						>
-							<option value="none">None</option>
-							<option value="sm">Small</option>
-							<option value="md">Medium</option>
-							<option value="lg">Large</option>
-						</select>
-					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 				</div>
-				<ThemeProvider
-					color={ { primary, bg } }
-					cornerRadius={ { preset: cornerRadiusPreset } }
-					isRoot
-				>
+				<ThemeProvider color={ { primary, bg } } isRoot>
 					<div
 						style={ {
 							display: 'grid',
