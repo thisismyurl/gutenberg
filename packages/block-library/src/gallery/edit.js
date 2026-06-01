@@ -140,6 +140,7 @@ export default function GalleryEdit( props ) {
 		isContentLocked,
 		onFocus,
 		context,
+		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
 
 	const isDynamic = !! attributes.dynamicSource;
@@ -160,6 +161,7 @@ export default function GalleryEdit( props ) {
 		: LINK_OPTIONS;
 
 	const {
+		align,
 		navigationButtonType,
 		columns,
 		imageCrop,
@@ -701,14 +703,21 @@ export default function GalleryEdit( props ) {
 		className: clsx(
 			className,
 			'has-nested-images',
-			// In dynamic mode there are no inner blocks, so the layout classes
-			// that the static gallery derives from its children (and `save.js`)
-			// are added here to keep the preview's flex/crop styles correct.
-			isDynamic && {
-				[ `columns-${ columns }` ]: columns !== undefined,
-				'columns-default': columns === undefined,
-				'is-cropped': imageCrop,
-			}
+			// In dynamic mode there are no inner blocks and the gallery isn't
+			// rendered through the `Gallery` component, so the classes that
+			// component normally composes onto the `<figure>` (see `gallery.js`)
+			// must be added here to keep the preview's flex/crop layout matching
+			// the static gallery and the frontend.
+			isDynamic && [
+				layoutClassNames,
+				'blocks-gallery-grid',
+				{
+					[ `align${ align }` ]: align,
+					[ `columns-${ columns }` ]: columns !== undefined,
+					'columns-default': columns === undefined,
+					'is-cropped': imageCrop,
+				},
+			]
 		),
 	} );
 
