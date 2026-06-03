@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Image: Add a comments panel to the lightbox, letting visitors read comments on the image's attachment and (when logged in) post new ones.
+
 ## 9.47.0 (2026-05-27)
 
 ### Internal
