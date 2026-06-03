@@ -5,11 +5,11 @@
 ### Bug Fixes
 
 -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
--   `Popover.Close`: Keep the popover anchored to its trigger while closing. When the close button carries an `id` (e.g. rendered as an `IconButton`, whose tooltip generates one), Base UI re-anchored the popover to the close button on close, causing it to jump before the exit animation played.
+-   `Popover.Close`: Keep the popover anchored to its trigger while closing. When the close button carries an `id` (e.g. rendered as an `IconButton`, whose tooltip generates one), Base UI re-anchored the popover to the close button on close, causing it to jump before the exit animation played ([#78885](https://github.com/WordPress/gutenberg/pull/78885)).
 
 ### Enhancements
 
--   `Popover`: Add open/close motion to the popup (shared `dropdown-motion` slide/fade) and optional backdrop (opacity fade), using WPDS motion tokens and matching `Select` and `Dialog` overlay patterns. Visual chrome moved to an inner surface so the transformed motion layer stays borderless and `Popover.Arrow` remains aligned with the anchor while animating. Backdrop fade uses the same `:not([data-starting-style])` guard as `dropdown-motion` so it does not snap in when Base UI sets both `data-open` and `data-starting-style` on mount.
+-   `Popover`: Add open/close motion to the popup (shared `dropdown-motion` slide/fade) and optional backdrop (opacity fade), using WPDS motion tokens and matching `Select` and `Dialog` overlay patterns. Visual chrome moved to an inner surface so the transformed motion layer stays borderless and `Popover.Arrow` remains aligned with the anchor while animating. Backdrop fade uses the same `:not([data-starting-style])` guard as `dropdown-motion` so it does not snap in when Base UI sets both `data-open` and `data-starting-style` on mount ([#78885](https://github.com/WordPress/gutenberg/pull/78885)).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ## 0.14.0 (2026-05-27)
