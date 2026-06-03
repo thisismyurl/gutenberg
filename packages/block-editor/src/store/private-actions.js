@@ -531,6 +531,22 @@ export function clearRequestedInspectorTab() {
 }
 
 /**
+ * Sets whether a block instance participates in List View-specific UI.
+ *
+ * @param {string}  clientId The block client ID.
+ * @param {boolean} enabled  Whether the block participates in List View-specific UI.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockListViewEnabled( clientId, enabled ) {
+	return {
+		type: 'SET_BLOCK_LIST_VIEW_ENABLED',
+		clientId,
+		enabled,
+	};
+}
+
+/**
  * Sets the selected style state for a block's style controls.
  *
  * @param {string} clientId The block client ID.

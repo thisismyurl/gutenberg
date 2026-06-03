@@ -27,9 +27,10 @@ import {
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
+	hasBlockListViewSupport,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
-import { deviceTypeKey } from '../private-keys';
+import { deviceTypeKey, disableListViewKey } from '../private-keys';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -72,6 +73,87 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'hasBlockListViewSupport', () => {
+		const blockWithListViewSupport = 'core/test-list-view-support';
+		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
+
+		const createState = ( blockName, blockListSettings = new Map() ) => ( {
+			blocks: {
+				byClientId: new Map( [ [ 'client-1', { name: blockName } ] ] ),
+			},
+			blockListSettings,
+		} );
+
+		beforeAll( () => {
+			registerBlockType( blockWithListViewSupport, {
+				apiVersion: 3,
+				title: 'List View support',
+				category: 'text',
+				supports: {
+					listView: true,
+				},
+			} );
+			registerBlockType( blockWithoutListViewSupport, {
+				apiVersion: 3,
+				title: 'No List View support',
+				category: 'text',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( blockWithListViewSupport );
+			unregisterBlockType( blockWithoutListViewSupport );
+		} );
+
+		it( 'returns true for blocks with list view support', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when the instance disables list view', () => {
+			const state = createState(
+				blockWithListViewSupport,
+				new Map( [
+					[
+						'client-1',
+						{
+							[ disableListViewKey ]: true,
+						},
+					],
+				] )
+			);
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'does not grant list view support to unsupported block types', () => {
+			const state = createState(
+				blockWithoutListViewSupport,
+				new Map( [
+					[
+						'client-1',
+						{
+							[ disableListViewKey ]: false,
+						},
+					],
+				] )
+			);
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'preserves the navigation block special case', () => {
+			const state = createState( 'core/navigation' );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
 		} );
 	} );
 

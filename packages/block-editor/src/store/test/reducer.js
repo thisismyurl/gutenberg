@@ -46,7 +46,11 @@ import {
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	disableListViewKey,
+} from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
@@ -3525,6 +3529,68 @@ describe( 'state', () => {
 						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 						{
 							allowedBlocks: true,
+						},
+					],
+				] )
+			);
+		} );
+
+		it( 'should update the list view setting of a block without replacing other settings', () => {
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
+
+			const state = blockListSettings( original, {
+				type: 'SET_BLOCK_LIST_VIEW_ENABLED',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				enabled: false,
+			} );
+
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+							[ disableListViewKey ]: true,
+						},
+					],
+				] )
+			);
+		} );
+
+		it( 'should clear the list view setting of a block without replacing other settings', () => {
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+							[ disableListViewKey ]: true,
+						},
+					],
+				] )
+			);
+
+			const state = blockListSettings( original, {
+				type: 'SET_BLOCK_LIST_VIEW_ENABLED',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				enabled: true,
+			} );
+
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
 						},
 					],
 				] )

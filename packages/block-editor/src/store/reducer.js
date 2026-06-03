@@ -19,7 +19,11 @@ import {
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	disableListViewKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -1833,6 +1837,36 @@ export const blockListSettings = ( state = new Map(), action ) => {
 			const newState = new Map( state );
 			for ( const clientId of action.clientIds ) {
 				newState.delete( clientId );
+			}
+			return newState;
+		}
+		case 'SET_BLOCK_LIST_VIEW_ENABLED': {
+			const currentSettings = state.get( action.clientId ) ?? {};
+			const hasDisabledListViewSetting = Object.hasOwn(
+				currentSettings,
+				disableListViewKey
+			);
+			const isDisabled = currentSettings[ disableListViewKey ] === true;
+
+			if (
+				( action.enabled && ! hasDisabledListViewSetting ) ||
+				( ! action.enabled && isDisabled )
+			) {
+				return state;
+			}
+
+			const nextSettings = { ...currentSettings };
+			if ( action.enabled ) {
+				delete nextSettings[ disableListViewKey ];
+			} else {
+				nextSettings[ disableListViewKey ] = true;
+			}
+
+			const newState = new Map( state );
+			if ( ! Object.keys( nextSettings ).length ) {
+				newState.delete( action.clientId );
+			} else {
+				newState.set( action.clientId, nextSettings );
 			}
 			return newState;
 		}

@@ -31,7 +31,13 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	Platform,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { View } from '@wordpress/primitives';
@@ -78,6 +84,7 @@ import {
 	DEFAULT_ORDER,
 } from './dynamic-source';
 import OrderControl from './order-control';
+import { unlock } from '../lock-unlock';
 
 const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
@@ -181,14 +188,20 @@ export default function GalleryEdit( props ) {
 		aspectRatio,
 	} = attributes;
 
+	const blockEditorDispatch = useDispatch( blockEditorStore );
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
 		selectBlock,
-	} = useDispatch( blockEditorStore );
+	} = blockEditorDispatch;
+	const { setBlockListViewEnabled } = unlock( blockEditorDispatch );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+
+	useLayoutEffect( () => {
+		setBlockListViewEnabled( clientId, ! isDynamic );
+	}, [ clientId, isDynamic, setBlockListViewEnabled ] );
 
 	const {
 		getBlock,

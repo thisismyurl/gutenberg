@@ -21,6 +21,7 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getBlockListSettings,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -37,6 +38,7 @@ import {
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
+	disableListViewKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
@@ -1075,6 +1077,27 @@ export function isListViewPanelOpened( state, clientId ) {
  */
 export function getListViewExpandRevision( state ) {
 	return state.listViewExpandRevision || 0;
+}
+
+/**
+ * Returns whether a block instance participates in List View-specific UI for
+ * its inner blocks.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block participates in List View-specific UI.
+ */
+export function hasBlockListViewSupport( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	const hasTypeSupport =
+		blockName === 'core/navigation' ||
+		hasBlockSupport( blockName, 'listView' );
+
+	return (
+		hasTypeSupport &&
+		getBlockListSettings( state, clientId )?.[ disableListViewKey ] !== true
+	);
 }
 
 /**
