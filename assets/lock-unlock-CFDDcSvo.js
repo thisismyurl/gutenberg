@@ -1,0 +1,1 @@
+import{r as e,_ as r}from"./iframe-B-GmOiO6.js";function renderSlotWithChildren(r,n,o){return e.cloneElement(r??n,{children:o})}var{unlock:n}=r("I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.","@wordpress/ui");export{renderSlotWithChildren as r,n as u};
